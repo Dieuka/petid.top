@@ -1312,7 +1312,7 @@ function confirmCrop() {
     setPhoto(dataUrl);
     scheduleSave();
   } catch (err) {
-    showToast('❌ Không xử lý được ảnh, chọn ảnh khác thử nhé', 'err');
+    showToast('❌ Lỗi ảnh: ' + (err && err.message ? err.message : err), 'err');
     console.error('Crop error:', err);
   } finally {
     document.getElementById('cropperOverlay').classList.remove('show');
