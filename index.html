@@ -115,6 +115,64 @@ header p { font-size:11px; color:var(--ink-muted); font-weight:500; margin-top:1
 .photo-upload .hint { font-size:10px; color:#b8a898; margin-top:2px; }
 #photoPreview { width:60px; height:60px; border-radius:50%; object-fit:cover; border:2.5px solid var(--gold); display:none; margin:0 auto 5px; }
 
+/* ═══ IMAGE CROPPER ═══ */
+.cropper-overlay {
+  position:fixed; inset:0; z-index:10003;
+  background:rgba(26,18,9,.75); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; padding:16px;
+}
+.cropper-overlay.show { display:flex; }
+.cropper-box {
+  background:var(--cream); border-radius:18px; padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4); max-width:340px; width:100%;
+}
+.cropper-title { font-family:'Playfair Display',serif; font-size:17px; font-weight:900; color:var(--ink); text-align:center; margin-bottom:4px; }
+.cropper-sub { font-size:11px; color:var(--ink-muted); text-align:center; margin-bottom:14px; }
+.crop-viewport {
+  position:relative; width:220px; height:330px; margin:0 auto;
+  overflow:hidden; border-radius:10px;
+  background:#000; cursor:grab; touch-action:none;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+}
+.crop-viewport:active { cursor:grabbing; }
+.crop-viewport img { position:absolute; left:0; top:0; will-change:transform; user-select:none; -webkit-user-drag:none; pointer-events:none; max-width:none; }
+.crop-viewport::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.25) 1px,transparent 1px);
+  background-size:33.33% 33.33%;
+}
+.crop-zoom-row { display:flex; align-items:center; gap:9px; margin:14px 0 4px; }
+.crop-zoom-row span { font-size:14px; }
+.crop-zoom-row input[type=range] { flex:1; accent-color:var(--gold); }
+.crop-actions { display:flex; gap:8px; margin-top:12px; }
+.crop-btn {
+  flex:1; padding:11px; border-radius:9px;
+  font-family:'Be Vietnam Pro',sans-serif; font-size:13px; font-weight:700;
+  cursor:pointer; border:none; transition:all .2s;
+}
+.crop-cancel { background:rgba(201,151,58,.1); color:var(--ink); border:1.5px solid rgba(201,151,58,.3); }
+.crop-confirm { background:var(--ink); color:var(--gold-light); }
+.crop-confirm:hover, .crop-cancel:hover { transform:translateY(-1px); }
+
+/* ═══ REVIEW OVERLAY ═══ */
+.review-overlay {
+  position:fixed; inset:0; z-index:10003;
+  background:rgba(26,18,9,.78); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center; padding:16px;
+  overflow-y:auto;
+}
+.review-overlay.show { display:flex; }
+.review-box {
+  background:var(--cream); border-radius:18px; padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4); max-width:560px; width:100%;
+  margin:auto;
+}
+.review-imgs { display:flex; gap:12px; margin:14px 0 4px; }
+.review-side { flex:1; text-align:center; min-width:0; }
+.review-label { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:6px; }
+.review-side img { width:100%; height:auto; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.2); }
+@media (max-width:460px){ .review-imgs { flex-direction:column; } }
+
 /* Fields */
 .field { margin-bottom:9px; }
 label { font-size:10px; font-weight:600; color:var(--ink-soft); letter-spacing:.5px; text-transform:uppercase; display:block; margin-bottom:3px; }
@@ -186,6 +244,12 @@ textarea { resize:vertical; min-height:50px; }
 .price-total { border-top:1px dashed rgba(201,151,58,.35); margin-top:6px; padding-top:9px; }
 .price-total span { font-size:15px !important; font-weight:800 !important; }
 .price-total span:last-child { color:var(--gold) !important; }
+.price-note {
+  margin-top:9px; padding-top:9px;
+  border-top:1px dashed rgba(201,151,58,.35);
+  font-size:10.5px; line-height:1.5; color:var(--ink-soft);
+  background:rgba(201,151,58,.06); border-radius:7px; padding:8px 10px;
+}
 .req-mark { color:#e11d48; font-weight:700; }
 .field input.invalid, .field textarea.invalid { border-color:#e11d48 !important; box-shadow:0 0 0 3px rgba(225,29,72,.1) !important; }
 
@@ -662,6 +726,7 @@ textarea { resize:vertical; min-height:50px; }
     <div class="price-row"><span>Tiền thẻ</span><span id="pbCards">50.000đ</span></div>
     <div class="price-row"><span>Phí vận chuyển</span><span id="pbShip">25.000đ</span></div>
     <div class="price-row price-total"><span>Tổng cộng</span><span id="pbTotal">75.000đ</span></div>
+    <div class="price-note">🎵 Đơn đặt qua TikTok tính theo giá bên TikTok, không thu thêm bất kỳ chi phí nào.</div>
   </div>
   <button class="order-btn" id="orderBtn" onclick="submitOrder()">📦 Đặt in — Gửi đơn cho shop</button>
   <div class="order-hint">Bấm nút trên để gửi thẳng ảnh thẻ + thông tin về shop. Sau khi gửi, shop sẽ in và liên hệ giao hàng — bạn không cần tải ảnh về. <b>Miễn phí ship từ 2 thẻ trở lên.</b></div>
@@ -1008,6 +1073,41 @@ textarea { resize:vertical; min-height:50px; }
   </div>
 </div>
 
+<!-- ═══ IMAGE CROPPER ═══ -->
+<div class="cropper-overlay" id="cropperOverlay">
+  <div class="cropper-box">
+    <div class="cropper-title">Chỉnh ảnh thú cưng</div>
+    <div class="cropper-sub">Kéo để di chuyển · dùng thanh trượt để phóng to</div>
+    <div class="crop-viewport" id="cropViewport">
+      <img id="cropImg" src="" alt="">
+    </div>
+    <div class="crop-zoom-row">
+      <span>🔍</span>
+      <input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1">
+    </div>
+    <div class="crop-actions">
+      <button class="crop-btn crop-cancel" onclick="cancelCrop()">Huỷ</button>
+      <button class="crop-btn crop-confirm" onclick="confirmCrop()">Xong</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ XEM LẠI THẺ ═══ -->
+<div class="review-overlay" id="reviewOverlay">
+  <div class="review-box">
+    <div class="cropper-title">Xem lại thẻ trước khi đặt</div>
+    <div class="cropper-sub">Kiểm tra kỹ 2 mặt. Nếu ổn, bấm "Chốt đơn" để gửi.</div>
+    <div class="review-imgs">
+      <div class="review-side"><div class="review-label">Mặt trước</div><img id="reviewFront" src="" alt="Mặt trước"></div>
+      <div class="review-side"><div class="review-label">Mặt sau</div><img id="reviewBack" src="" alt="Mặt sau"></div>
+    </div>
+    <div class="crop-actions">
+      <button class="crop-btn crop-cancel" onclick="closeReview()">Quay lại chỉnh</button>
+      <button class="crop-btn crop-confirm" onclick="confirmOrder()">✅ Chốt đơn</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── Stars ──
 const ratings = { hamAn:5, quayPha:4, dangYeu:5, thongMinh:4, thanThien:5 };
@@ -1039,21 +1139,113 @@ function setGender(g) {
   sync();
 }
 
-// ── Photo ──
+// ══════════════════════════════════════════
+//  ẢNH + BỘ CẮT ẢNH (tỉ lệ 2:3 khớp ô ảnh thẻ)
+// ══════════════════════════════════════════
+const CROP_RATIO = 168 / 252;      // = ô ảnh trên thẻ (rộng/cao)
+const VP_W = 220, VP_H = 330;      // kích thước khung xem trong cropper
+const crop = { img: new Image(), natW: 0, natH: 0, minScale: 1, scale: 1, x: 0, y: 0, dragging: false, sx: 0, sy: 0 };
+
 document.getElementById('photoInput').onchange = e => {
-  const file = e.target.files[0]; if(!file) return;
+  const file = e.target.files[0]; if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Ảnh quá 5MB, chọn ảnh nhỏ hơn nhé', 'err'); e.target.value = ''; return; }
   const reader = new FileReader();
-  reader.onload = x => {
-    const src = x.target.result;
-    const p = document.getElementById('photoPreview');
-    p.src = src; p.style.display = 'block';
-    document.getElementById('photoPlaceholder').style.display = 'none';
-    document.getElementById('fcPhotoEmoji').style.display = 'none';
-    const img = document.getElementById('fcPhoto');
-    img.src = src; img.style.display = 'block';
-  };
+  reader.onload = x => openCropper(x.target.result);
   reader.readAsDataURL(file);
+  e.target.value = ''; // cho phép chọn lại cùng 1 ảnh
 };
+
+function openCropper(src) {
+  const cropImg = document.getElementById('cropImg');
+  const probe = new Image();
+  probe.onload = () => {
+    crop.natW = probe.naturalWidth;
+    crop.natH = probe.naturalHeight;
+    // scale tối thiểu để ảnh luôn phủ kín khung (cover)
+    crop.minScale = Math.max(VP_W / crop.natW, VP_H / crop.natH);
+    crop.scale = crop.minScale;
+    cropImg.src = src;
+    cropImg.style.width = crop.natW + 'px';
+    cropImg.style.height = crop.natH + 'px';
+    // căn giữa
+    crop.x = (VP_W - crop.natW * crop.scale) / 2;
+    crop.y = (VP_H - crop.natH * crop.scale) / 2;
+    const zoom = document.getElementById('cropZoom');
+    zoom.min = crop.minScale.toFixed(3);
+    zoom.max = (crop.minScale * 3).toFixed(3);
+    zoom.step = (crop.minScale / 100).toFixed(4);
+    zoom.value = crop.scale;
+    applyCropTransform();
+    document.getElementById('cropperOverlay').classList.add('show');
+  };
+  probe.src = src;
+}
+
+function clampCrop() {
+  const w = crop.natW * crop.scale, h = crop.natH * crop.scale;
+  crop.x = Math.min(0, Math.max(VP_W - w, crop.x));
+  crop.y = Math.min(0, Math.max(VP_H - h, crop.y));
+}
+function applyCropTransform() {
+  clampCrop();
+  document.getElementById('cropImg').style.transform =
+    `translate(${crop.x}px, ${crop.y}px) scale(${crop.scale})`;
+}
+
+// Kéo di chuyển (chuột + cảm ứng)
+(function bindCropDrag(){
+  const vp = document.getElementById('cropViewport');
+  const start = (px, py) => { crop.dragging = true; crop.sx = px - crop.x; crop.sy = py - crop.y; };
+  const move = (px, py) => { if (!crop.dragging) return; crop.x = px - crop.sx; crop.y = py - crop.sy; applyCropTransform(); };
+  const end = () => { crop.dragging = false; };
+  vp.addEventListener('mousedown', e => start(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  window.addEventListener('mouseup', end);
+  vp.addEventListener('touchstart', e => { const t = e.touches[0]; start(t.clientX, t.clientY); }, {passive:true});
+  vp.addEventListener('touchmove', e => { const t = e.touches[0]; move(t.clientX, t.clientY); }, {passive:true});
+  vp.addEventListener('touchend', end);
+})();
+
+document.getElementById('cropZoom').addEventListener('input', e => {
+  const newScale = parseFloat(e.target.value);
+  // zoom quanh tâm khung
+  const cx = VP_W / 2, cy = VP_H / 2;
+  crop.x = cx - (cx - crop.x) * (newScale / crop.scale);
+  crop.y = cy - (cy - crop.y) * (newScale / crop.scale);
+  crop.scale = newScale;
+  applyCropTransform();
+});
+
+function cancelCrop() {
+  document.getElementById('cropperOverlay').classList.remove('show');
+}
+
+function confirmCrop() {
+  // Nướng vùng đã chọn ra canvas đúng tỉ lệ → hết méo khi html2canvas render
+  const OUT_W = 168 * 4, OUT_H = 252 * 4; // độ phân giải cao để in nét
+  const canvas = document.createElement('canvas');
+  canvas.width = OUT_W; canvas.height = OUT_H;
+  const ctx = canvas.getContext('2d');
+  const k = OUT_W / VP_W; // khung xuất / khung xem
+  // vùng nguồn trên ảnh gốc tương ứng với khung xem
+  const sx = -crop.x / crop.scale;
+  const sy = -crop.y / crop.scale;
+  const sw = VP_W / crop.scale;
+  const sh = VP_H / crop.scale;
+  ctx.drawImage(crop.img, sx, sy, sw, sh, 0, 0, OUT_W, OUT_H);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+  const p = document.getElementById('photoPreview');
+  p.src = dataUrl; p.style.display = 'block';
+  document.getElementById('photoPlaceholder').style.display = 'none';
+  document.getElementById('fcPhotoEmoji').style.display = 'none';
+  const fc = document.getElementById('fcPhoto');
+  fc.src = dataUrl; fc.style.display = 'block';
+
+  document.getElementById('cropperOverlay').classList.remove('show');
+}
+// cropImg dùng chung đối tượng Image để confirmCrop vẽ lại
+document.getElementById('cropImg').addEventListener('load', function(){ crop.img = this; });
 
 // ── Themes ──
 const THEMES = {
@@ -1311,14 +1503,30 @@ function showImageModal(url, filename) {
 //  ĐẶT IN — GỬI ĐƠN QUA TELEGRAM
 // ════════════════════════════════════════════
 // ┌──────────────────────────────────────────────────────────┐
-// │  CHỦ SHOP ĐIỀN 2 DÒNG DƯỚI ĐÂY (xem hướng dẫn cuối trang) │
+// │  CẤU HÌNH GỬI ĐƠN                                          │
 // └──────────────────────────────────────────────────────────┘
-const TELEGRAM_BOT_TOKEN = '8942954765:AAEwD0vfTrV9Zs3j81GpVS-ff7_hbSSOMyI';   // ví dụ: 123456789:AAExxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-const TELEGRAM_CHAT_ID   = '-5491271185';     // ví dụ: 987654321
+// ▸ CÁCH AN TOÀN (khuyên dùng — giấu token): dán URL Cloudflare Worker.
+//   Khi có WORKER_URL, app gửi đơn qua Worker và KHÔNG cần token bên dưới.
+//   Lúc đó hãy XOÁ TRỐNG token để không lộ trong mã nguồn. Xem file
+//   cloudflare-worker.js để biết cách tạo Worker (miễn phí, 5 phút).
+const TELEGRAM_WORKER_URL = 'https://petidtop.hoaquangdieu0203.workers.dev';
 
+// ▸ CÁCH TRỰC TIẾP (token lộ trong mã nguồn) — chỉ dùng khi CHƯA có Worker.
+//   ĐÃ chuyển sang dùng Worker ở trên → 2 dòng dưới để trống cho an toàn.
+const TELEGRAM_BOT_TOKEN = '';
+const TELEGRAM_CHAT_ID   = '';
+
+const useWorker = TELEGRAM_WORKER_URL && TELEGRAM_WORKER_URL.startsWith('http');
 function tgConfigured() {
+  if (useWorker) return true;
   return TELEGRAM_BOT_TOKEN && !TELEGRAM_BOT_TOKEN.startsWith('DAN_') &&
          TELEGRAM_CHAT_ID && !String(TELEGRAM_CHAT_ID).startsWith('DAN_');
+}
+// Đầu URL API: qua Worker thì gọi Worker, ngược lại gọi thẳng Telegram.
+function tgApi(method) {
+  return useWorker
+    ? `${TELEGRAM_WORKER_URL.replace(/\/$/, '')}/${method}`
+    : `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`;
 }
 
 function validateOrder() {
@@ -1392,55 +1600,103 @@ function buildOrderText() {
 }
 
 async function tgSendMessage(text) {
-  const r = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+  const body = { text };
+  if (!useWorker) body.chat_id = TELEGRAM_CHAT_ID;   // Worker tự thêm chat_id
+  const r = await fetch(tgApi('sendMessage'), {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text })
+    body: JSON.stringify(body)
   });
   const j = await r.json();
   if (!j.ok) throw new Error(j.description || 'sendMessage failed');
 }
 
-async function tgSendPhoto(blob, caption) {
+// Gửi ảnh dưới dạng FILE (sendDocument) → Telegram KHÔNG nén, giữ nguyên
+// chất lượng gốc để in nét. (sendPhoto sẽ bị nén, không dùng.)
+async function tgSendDocument(blob, filename, caption) {
   const fd = new FormData();
-  fd.append('chat_id', TELEGRAM_CHAT_ID);
-  fd.append('photo', blob, 'card.png');
+  if (!useWorker) fd.append('chat_id', TELEGRAM_CHAT_ID);   // Worker tự thêm chat_id
+  fd.append('document', blob, filename);
   if (caption) fd.append('caption', caption);
-  const r = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, { method:'POST', body: fd });
+  const r = await fetch(tgApi('sendDocument'), { method:'POST', body: fd });
   const j = await r.json();
-  if (!j.ok) throw new Error(j.description || 'sendPhoto failed');
+  if (!j.ok) throw new Error(j.description || 'sendDocument failed');
 }
 
+let pendingOrder = null; // { frontBlob, backBlob, frontUrl, backUrl }
+
+function clearPendingOrder() {
+  if (!pendingOrder) return;
+  URL.revokeObjectURL(pendingOrder.frontUrl);
+  URL.revokeObjectURL(pendingOrder.backUrl);
+  pendingOrder = null;
+}
+
+// Bước 1: bấm "Đặt in" → tạo ảnh 2 mặt → hiện modal xem lại
 async function submitOrder() {
   const v = validateOrder();
   if (!v.ok) { showToast('⚠️ ' + v.msg, 'err'); return; }
 
   const btn = document.getElementById('orderBtn');
+  btn.disabled = true;
+  showToast('⏳ Đang tạo ảnh thẻ để xem lại...', '');
+  try {
+    const [frontCanvas, backCanvas] = await Promise.all([ renderCard('frontCard'), renderCard('backCard') ]);
+    const [frontBlob, backBlob] = await Promise.all([ canvasToBlob(frontCanvas), canvasToBlob(backCanvas) ]);
+    clearPendingOrder();
+    pendingOrder = {
+      frontBlob, backBlob,
+      frontUrl: URL.createObjectURL(frontBlob),
+      backUrl: URL.createObjectURL(backBlob),
+    };
+    document.getElementById('reviewFront').src = pendingOrder.frontUrl;
+    document.getElementById('reviewBack').src = pendingOrder.backUrl;
+    document.getElementById('reviewOverlay').classList.add('show');
+  } catch (err) {
+    showToast('❌ Không tạo được ảnh, thử lại nhé', 'err');
+    console.error('Preview error:', err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Quay lại chỉnh sửa
+function closeReview() {
+  document.getElementById('reviewOverlay').classList.remove('show');
+  clearPendingOrder();
+}
+
+// Bước 2: bấm "Chốt đơn" trong modal xem lại → gửi Telegram
+async function confirmOrder() {
+  const reviewOv = document.getElementById('reviewOverlay');
   const overlay = document.getElementById('sendingOverlay');
 
   // Chưa cấu hình bot → fallback: tải ảnh + mở Zalo để khách gửi tay
   if (!tgConfigured()) {
+    reviewOv.classList.remove('show');
     showToast('ℹ️ Đang mở Zalo để gửi đơn...', '');
     download('frontCard', 'pet-id-mat-truoc.png');
     setTimeout(() => window.open('https://zalo.me/0355773922', '_blank'), 600);
     return;
   }
 
-  btn.disabled = true;
+  if (!pendingOrder) { showToast('⚠️ Ảnh chưa sẵn sàng, thử lại', 'err'); return; }
+
+  reviewOv.classList.remove('show');
   overlay.classList.add('show');
   try {
-    const [frontCanvas, backCanvas] = await Promise.all([ renderCard('frontCard'), renderCard('backCard') ]);
-    const [frontBlob, backBlob] = await Promise.all([ canvasToBlob(frontCanvas), canvasToBlob(backCanvas) ]);
+    const idNum = document.getElementById('fcIdNum').textContent || 'PET';
     await tgSendMessage(buildOrderText());
-    await tgSendPhoto(frontBlob, '🪪 Mặt trước');
-    await tgSendPhoto(backBlob, '🪪 Mặt sau');
+    await tgSendDocument(pendingOrder.frontBlob, `${idNum}-mat-truoc.png`, '🪪 Mặt trước (ảnh gốc để in)');
+    await tgSendDocument(pendingOrder.backBlob, `${idNum}-mat-sau.png`, '🪪 Mặt sau (ảnh gốc để in)');
+    // Gạch ngang chia đơn — kết thúc 1 đơn
+    await tgSendMessage('━━━━━━━━━━━━━━━━━━━\n✅ HẾT ĐƠN\n━━━━━━━━━━━━━━━━━━━');
     overlay.classList.remove('show');
+    clearPendingOrder();
     showToast('✅ Đã gửi đơn! Shop sẽ liên hệ giao thẻ cho bạn.', 'ok');
   } catch (err) {
     overlay.classList.remove('show');
     showToast('❌ Gửi đơn lỗi. Bạn hãy bấm Chat Zalo để gửi trực tiếp nhé.', 'err');
     console.error('Order error:', err);
-  } finally {
-    btn.disabled = false;
   }
 }
 </script>
