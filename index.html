@@ -1295,23 +1295,28 @@ function cancelCrop() {
 }
 
 function confirmCrop() {
-  // Nướng vùng đã chọn ra canvas đúng tỉ lệ → hết méo khi html2canvas render
-  const OUT_W = 168 * 4, OUT_H = 252 * 4; // độ phân giải cao để in nét
-  const canvas = document.createElement('canvas');
-  canvas.width = OUT_W; canvas.height = OUT_H;
-  const ctx = canvas.getContext('2d');
-  const k = OUT_W / VP_W; // khung xuất / khung xem
-  // vùng nguồn trên ảnh gốc tương ứng với khung xem
-  const sx = -crop.x / crop.scale;
-  const sy = -crop.y / crop.scale;
-  const sw = VP_W / crop.scale;
-  const sh = VP_H / crop.scale;
-  ctx.drawImage(crop.img, sx, sy, sw, sh, 0, 0, OUT_W, OUT_H);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-
-  setPhoto(dataUrl);
-  scheduleSave();
-  document.getElementById('cropperOverlay').classList.remove('show');
+  // finally đảm bảo cropper LUÔN đóng khi bấm Xong, dù nướng ảnh có lỗi (không kẹt modal)
+  try {
+    // Nướng vùng đã chọn ra canvas đúng tỉ lệ → hết méo khi html2canvas render
+    const OUT_W = 168 * 4, OUT_H = 252 * 4; // độ phân giải cao để in nét
+    const canvas = document.createElement('canvas');
+    canvas.width = OUT_W; canvas.height = OUT_H;
+    const ctx = canvas.getContext('2d');
+    // vùng nguồn trên ảnh gốc tương ứng với khung xem
+    const sx = -crop.x / crop.scale;
+    const sy = -crop.y / crop.scale;
+    const sw = VP_W / crop.scale;
+    const sh = VP_H / crop.scale;
+    ctx.drawImage(crop.img, sx, sy, sw, sh, 0, 0, OUT_W, OUT_H);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    setPhoto(dataUrl);
+    scheduleSave();
+  } catch (err) {
+    showToast('❌ Không xử lý được ảnh, chọn ảnh khác thử nhé', 'err');
+    console.error('Crop error:', err);
+  } finally {
+    document.getElementById('cropperOverlay').classList.remove('show');
+  }
 }
 
 // Hiển thị / xoá ảnh thú cưng (dùng chung cho crop, khôi phục nháp, làm thẻ mới)
