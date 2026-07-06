@@ -1232,6 +1232,9 @@ function openCropper(src) {
   probe.onload = () => {
     crop.natW = probe.naturalWidth;
     crop.natH = probe.naturalHeight;
+    // probe đã load xong 100% → dùng LÀM nguồn vẽ canvas (chắc chắn có pixel).
+    // Không phụ thuộc load event của cropImg (không fire lại khi cùng src → vẽ ảnh rỗng → JPEG đen).
+    crop.img = probe;
     // scale tối thiểu để ảnh luôn phủ kín khung (cover)
     crop.minScale = Math.max(VP_W / crop.natW, VP_H / crop.natH);
     crop.scale = crop.minScale;
@@ -1332,8 +1335,6 @@ function getPhoto() {
   const fc = document.getElementById('fcPhoto');
   return (fc && fc.style.display !== 'none' && fc.src && fc.src.startsWith('data:')) ? fc.src : '';
 }
-// cropImg dùng chung đối tượng Image để confirmCrop vẽ lại
-document.getElementById('cropImg').addEventListener('load', function(){ crop.img = this; });
 
 // ── Themes ──
 const THEMES = {
