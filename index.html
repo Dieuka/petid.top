@@ -153,7 +153,8 @@ header p { font-size:11px; color:var(--ink-muted); font-weight:500; margin-top:1
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
 }
 .crop-viewport:active { cursor:grabbing; }
-.crop-viewport img { position:absolute; left:0; top:0; will-change:transform; user-select:none; -webkit-user-drag:none; pointer-events:none; max-width:none; }
+/* transform-origin:0 0 BẮT BUỘC — mọi phép tính crop (căn giữa, kéo, nướng canvas) giả định gốc góc trên-trái; bỏ đi → ảnh scale quanh tâm, lệch về góc & lộ nền đen */
+.crop-viewport img { position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform; user-select:none; -webkit-user-drag:none; pointer-events:none; max-width:none; }
 .crop-viewport::after {
   content:''; position:absolute; inset:0; pointer-events:none;
   background-image:linear-gradient(rgba(255,255,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.25) 1px,transparent 1px);
