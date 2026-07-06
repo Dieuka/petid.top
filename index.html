@@ -1381,22 +1381,32 @@ function genCardId() {
 }
 let cardId = genCardId();
 
+// Dữ liệu mẫu hiển thị trên thẻ khi ô còn trống (chỉ để xem trước — đã bắt
+// buộc điền đủ mới gửi được nên không lo khách gửi nhầm thẻ mẫu).
+const DEMO = {
+  name: 'MÍT ƯỚT', breed: 'Mèo Anh lông ngắn', dob: '20/05/2022',
+  color: 'Xám trắng', origin: 'Hà Nội', slogan: 'Tôi không béo, tôi chỉ nhiều lông.',
+  likes: 'Ăn vặt, ngủ, chơi bóng', dislikes: 'Tắm, bị bế, chó to',
+  mark: 'Mặt tròn, tai cụp nhẹ, đuôi ngắn',
+};
+
 // ── Sync ──
 function sync() {
-  const name     = document.getElementById('fName').value;
+  const name     = document.getElementById('fName').value || DEMO.name;
   const speciesSel = document.getElementById('fSpecies').value;
   const species = speciesSel === 'Khác...'
     ? (document.getElementById('fSpeciesCustom').value || 'Khác')
     : speciesSel;
-  const breed    = document.getElementById('fBreed').value;
-  const dob      = fmtDate(document.getElementById('fDob').value);
+  const breed    = document.getElementById('fBreed').value || DEMO.breed;
+  const dobRaw   = document.getElementById('fDob').value;
+  const dob      = dobRaw ? fmtDate(dobRaw) : DEMO.dob;
   const issue    = fmtDate(document.getElementById('fIssue').value);
-  const color    = document.getElementById('fColor').value;
-  const origin   = document.getElementById('fOrigin').value;
-  const slogan   = document.getElementById('fSlogan').value;
-  const likes    = document.getElementById('fLikes').value;
-  const dislikes = document.getElementById('fDislikes').value;
-  const mark     = document.getElementById('fMark').value;
+  const color    = document.getElementById('fColor').value || DEMO.color;
+  const origin   = document.getElementById('fOrigin').value || DEMO.origin;
+  const slogan   = document.getElementById('fSlogan').value || DEMO.slogan;
+  const likes    = document.getElementById('fLikes').value || DEMO.likes;
+  const dislikes = document.getElementById('fDislikes').value || DEMO.dislikes;
+  const mark     = document.getElementById('fMark').value || DEMO.mark;
   const weight   = document.getElementById('fWeight') ? document.getElementById('fWeight').value : '';
   const owner    = document.getElementById('fOwner') ? document.getElementById('fOwner').value : '';
   const phone    = document.getElementById('fPhone') ? document.getElementById('fPhone').value : '';
