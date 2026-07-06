@@ -1312,7 +1312,7 @@ function confirmCrop() {
     setPhoto(dataUrl);
     scheduleSave();
   } catch (err) {
-    showToast('❌ Lỗi ảnh: ' + (err && err.message ? err.message : err), 'err');
+    showToast('❌ Không xử lý được ảnh, chọn ảnh khác thử nhé', 'err');
     console.error('Crop error:', err);
   } finally {
     document.getElementById('cropperOverlay').classList.remove('show');
@@ -1525,7 +1525,10 @@ const DRAFT_KEY = 'petid_draft_v1';
 const PET_FIELDS = ['fName','fSpecies','fSpeciesCustom','fBreed','fDob','fIssue','fColor','fOrigin','fSlogan','fLikes','fDislikes','fMark'];
 const ORDER_FIELDS = ['oName','oPhone','oTiktok','oAddress','oQty','oNote'];
 
-let saveTimer = null;
+// var (KHÔNG let): sync() chạy ở dòng trên gọi scheduleSave() TRƯỚC dòng này.
+// let sẽ dính temporal-dead-zone → "Cannot access 'saveTimer' before initialization".
+// var hoist về đầu script, init undefined; clearTimeout(undefined) là no-op an toàn.
+var saveTimer = null;
 function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 400); }
 function saveDraft() {
   try {
