@@ -1333,6 +1333,13 @@ function renderBackStars() {
   });
 }
 
+// ── Mã thẻ (random, tạo 1 lần cho mỗi thẻ) ──
+function genCardId() {
+  const n = Math.floor(Math.random() * 9999) + 1;
+  return `PET-2026-${String(n).padStart(4, '0')}`;
+}
+let cardId = genCardId();
+
 // ── Sync ──
 function sync() {
   const name     = document.getElementById('fName').value;
@@ -1353,10 +1360,7 @@ function sync() {
   const owner    = document.getElementById('fOwner') ? document.getElementById('fOwner').value : '';
   const phone    = document.getElementById('fPhone') ? document.getElementById('fPhone').value : '';
 
-  const idNum = (() => {
-    const hash = [...name].reduce((a,c)=>a+c.charCodeAt(0),0) || 1;
-    return `PET-2026-${String(hash % 9999 + 1).padStart(4,'0')}`;
-  })();
+  const idNum = cardId;
 
   document.getElementById('cNameRow').textContent = name || '—';
   document.getElementById('cNameRow').style.color = THEMES[curTheme].acc;
@@ -1557,10 +1561,6 @@ function validateOrder() {
 
 function buildOrderText() {
   const g = id => (document.getElementById(id)?.value || '').trim();
-  const speciesSel = document.getElementById('fSpecies').value;
-  const species = speciesSel === 'Khác...' ? (g('fSpeciesCustom') || 'Khác') : speciesSel;
-  const traitNames = { hamAn:'Ham ăn', quayPha:'Quậy phá', dangYeu:'Đáng yêu', thongMinh:'Thông minh', thanThien:'Thân thiện' };
-  const traits = Object.entries(ratings).map(([k,v]) => `${traitNames[k]}: ${'★'.repeat(v)}`).join(' · ');
   const tiktok = g('oTiktok');
   const source = tiktok ? '🎵 TIKTOK' : '💬 ZALO/WEB';
   const tiktokLine = tiktok ? `\n• ID TikTok: ${tiktok}` : '';
@@ -1582,19 +1582,8 @@ function buildOrderText() {
 • Phí ship: ${shipLine}
 • TỔNG CỘNG: ${fmtVND(total)}
 
-🐾 THÚ CƯNG
-• Tên: ${g('fName')}
-• Loài: ${species} · Giới tính: ${gender}
-• Giống: ${g('fBreed')}
-• Ngày sinh: ${fmtDate(g('fDob'))}
-• Màu lông: ${g('fColor')} · Quê: ${g('fOrigin')}
-• Tính cách: ${traits}
-• Slogan: "${g('fSlogan')}"
-• Thích: ${g('fLikes')}
-• Không thích: ${g('fDislikes')}
-• Nhận dạng: ${g('fMark')}
-• Mẫu thẻ (màu): ${curTheme}
-• Mã thẻ: ${document.getElementById('fcIdNum').textContent}
+🐾 Thú cưng: ${g('fName')} · Mã thẻ: ${document.getElementById('fcIdNum').textContent}
+(Chi tiết xem 2 ảnh thẻ gửi kèm)
 ━━━━━━━━━━━━━━━━━━━`
   );
 }
@@ -1692,6 +1681,9 @@ async function confirmOrder() {
     await tgSendMessage('━━━━━━━━━━━━━━━━━━━\n✅ HẾT ĐƠN\n━━━━━━━━━━━━━━━━━━━');
     overlay.classList.remove('show');
     clearPendingOrder();
+    // Đổi mã thẻ mới cho đơn tiếp theo (tránh trùng mã đơn vừa gửi)
+    cardId = genCardId();
+    sync();
     showToast('✅ Đã gửi đơn! Shop sẽ liên hệ giao thẻ cho bạn.', 'ok');
   } catch (err) {
     overlay.classList.remove('show');
