@@ -1958,15 +1958,17 @@ async function confirmTiktokPhotos() {
   if (!pendingOrder) { showToast('⚠️ Ảnh chưa sẵn sàng, thử lại', 'err'); return; }
 
   const tiktok = document.getElementById('oTiktok').value.trim();
+  const phone = document.getElementById('oPhone').value.trim();
   const idNum = document.getElementById('fcIdNum').textContent || 'PET';
 
   reviewOv.classList.remove('show');
   overlay.classList.add('show');
   try {
+    const phoneLine = phone ? `\n• SĐT: ${phone}` : '';
     const msg =
 `🎵 GỬI ẢNH THẺ (ĐƠN TIKTOK)
 ━━━━━━━━━━━━━━━━━━━
-• ID TikTok: ${tiktok}
+• ID TikTok: ${tiktok}${phoneLine}
 • Mã thẻ: ${idNum}
 • (Khách đã đặt & thanh toán bên TikTok — chỉ gửi ảnh in)`;
     await tgSendMessage(msg);
